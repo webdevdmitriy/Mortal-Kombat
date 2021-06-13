@@ -2,8 +2,6 @@ const $arenas = document.querySelector('.arenas')
 const $formFight = document.querySelector('.control')
 const $chat = document.querySelector('.chat')
 
-let num = 1
-
 const HIT = {
 	head: 30,
 	body: 25,
@@ -11,7 +9,8 @@ const HIT = {
 }
 const ATTACK = ['head', 'body', 'foot']
 const logs = {
-	start: 'Часы показывали [time], когда [player1] и [player2] бросили вызов друг другу.',
+	start:
+		'Часы показывали [time], когда [player1] и [player2] бросили вызов друг другу.',
 	end: [
 		'Результат удара [playerWins]: [playerLose] - труп',
 		'[playerLose] погиб от удара бойца [playerWins]',
@@ -159,8 +158,7 @@ function enemyAttack() {
 	const hit = ATTACK[getRandom(3) - 1]
 	const defence = ATTACK[getRandom(3) - 1]
 	return {
-		// value: getRandom(HIT[hit]),
-		value: 50,
+		value: getRandom(HIT[hit]),
 		hit,
 		defence
 	}
@@ -184,7 +182,6 @@ function playerAttack() {
 
 function showResult() {
 	if (player1.hp === 0 || player2.hp === 0) {
-		// $randomButton.disabled = true
 		createReloadButton()
 	}
 	if (player1.hp === 0 && player1.hp < player2.hp) {
@@ -195,14 +192,12 @@ function showResult() {
 		generateLogs('end', player1, player2)
 	} else if (player1.hp === 0 && player2.hp === 0) {
 		$arenas.appendChild(playerWins())
+		generateLogs('draw', player1, player2)
 	}
 }
 
-function generateLogs(type, player1, player2, damage, enemy) {
-	const text = logs[type][getRandom(logs[type].length - 1)]
-		.replace('[playerKick]', player1.name)
-		.replace('[playerDefence]', player2.name)
-	let el = `<p>${text}</p>`
+function generateLogs(type, player1, player2, damage) {
+	let el = ``
 
 	const time = new Date().toLocaleTimeString().slice(0, -3)
 
@@ -211,42 +206,54 @@ function generateLogs(type, player1, player2, damage, enemy) {
 			el = startFight(time, player1, player2)
 			break
 		case 'hit':
-			el = hitFight(time, text, damage)
+			el = hitFight(time, damage, player1)
 			break
 		case 'defence':
-			el = defenceFight(time, text)
+			el = defenceFight(time)
 			break
 		case 'end':
-			el = endFight(time, player1, player2)
+			el = endFight(player1, player2)
 			break
+		case 'draw':
+			el = drawFight()
 	}
 	$chat.insertAdjacentHTML('afterbegin', el)
 }
 
-function startFight(time, player) {
+function startFight(time) {
 	const text = logs['start']
 		.replace('[time]', time)
 		.replace('[player1]', player1.name)
 		.replace('[player2]', player2.name)
 	return `<p>${text}</p>`
 }
-function hitFight(time, text, damage, enemy) {
-	return `<p>${time} ${text} -${damage} [${enemy ? player2.hp : player1.hp} / 100]</p>`
+function hitFight(time, damage, name1) {
+	const text = logs['hit'][getRandom(logs['hit'].length - 1)]
+		.replace('[playerKick]', player1.name)
+		.replace('[playerDefence]', player2.name)
+	return `<p>${time} ${text} -${damage} 
+	[${name1.player === 2 ? player1.hp : player2.hp} / 100]</p>`
 }
-function defenceFight(time, text) {
+function defenceFight(time) {
+	const text = logs['defence'][getRandom(logs['defence'].length - 1)]
+		.replace('[playerKick]', player1.name)
+		.replace('[playerDefence]', player2.name)
 	return `<p>${time} ${text}</p>`
 }
 
-function endFight(time, player1, player2) {
-	const text = logs['end'].replace('[playerWins]', player1.name).replace('[playerLose]', player2.name)
+function endFight(player1, player2) {
+	const text = logs['end'][getRandom(logs['end'].length - 1)]
+		.replace('[playerWins]', player1.name)
+		.replace('[playerLose]', player2.name)
 	return `<p>${text}</p>`
 }
-function drawFight(text) {
+function drawFight() {
+	const text = logs['draw']
 	return `<p>${text}</p>`
 }
 
 $formFight.addEventListener('submit', function (e) {
-	if (num++ === 1) {
+	if ($chat.innerHTML === '') {
 		generateLogs('start', player1, player2)
 	}
 	e.preventDefault()
@@ -256,7 +263,7 @@ $formFight.addEventListener('submit', function (e) {
 	if (player.hit !== enemy.defence) {
 		player2.changeHP(player.value)
 		player2.renderHP()
-		generateLogs('hit', player1, player2, player.value, true)
+		generateLogs('hit', player1, player2, player.value)
 	} else {
 		generateLogs('defence', player1, player2)
 	}
@@ -264,7 +271,7 @@ $formFight.addEventListener('submit', function (e) {
 	if (player.defence !== enemy.hit) {
 		player1.changeHP(enemy.value)
 		player1.renderHP()
-		generateLogs('hit', player2, player1, enemy.value, false)
+		generateLogs('hit', player2, player1, enemy.value)
 	} else {
 		generateLogs('defence', player2, player1)
 	}
