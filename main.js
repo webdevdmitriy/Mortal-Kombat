@@ -1,3 +1,5 @@
+import { getRandom } from './random.js'
+import { player1, player2, changeHP, elHP, renderHP } from './players.js'
 const $arenas = document.querySelector('.arenas')
 const $formFight = document.querySelector('.control')
 const $chat = document.querySelector('.chat')
@@ -48,47 +50,6 @@ const logs = {
 	draw: 'Ничья - это тоже победа!'
 }
 
-const player1 = {
-	player: 1,
-	name: 'Scorpion',
-	hp: 100,
-	img: 'http://reactmarathon-api.herokuapp.com/assets/scorpion.gif',
-	weapon: ['Sword', 'Bow'],
-	attack: function () {
-		console.log(this.name + ' Fight...')
-	},
-	changeHP,
-	elHP,
-	renderHP
-}
-
-const player2 = {
-	player: 2,
-	name: 'Sub-Zero',
-	hp: 100,
-	img: 'http://reactmarathon-api.herokuapp.com/assets/subzero.gif',
-	weapon: ['Sword', 'Bow'],
-	attack: function () {
-		console.log(this.name + ' Fight...')
-	},
-	changeHP,
-	elHP,
-	renderHP
-}
-
-function changeHP(numHp) {
-	this.hp -= numHp
-	if (this.hp <= 0) {
-		this.hp = 0
-	}
-}
-function elHP() {
-	return document.querySelector('.player' + this.player + ' .life')
-}
-function renderHP() {
-	this.elHP().style.width = this.hp + '%'
-}
-
 const createElement = (tag, className) => {
 	const $tag = document.createElement(tag)
 
@@ -130,10 +91,6 @@ const playerWins = name => {
 		$winTitle.innerText = 'draw'
 	}
 	return $winTitle
-}
-
-const getRandom = num => {
-	return Math.ceil(Math.random() * num)
 }
 
 const createReloadButton = () => {
