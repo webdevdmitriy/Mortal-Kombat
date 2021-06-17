@@ -1,6 +1,6 @@
 import { createElement } from '../utils/index.js'
 
-class Player {
+export default class Player {
 	constructor(props) {
 		this.name = props.name
 		this.hp = props.hp
@@ -49,5 +49,3 @@ class Player {
 		return $player
 	}
 }
-
-export default Player
