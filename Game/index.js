@@ -6,26 +6,38 @@ const $arenas = document.querySelector('.arenas')
 const $formFight = document.querySelector('.control')
 const $chat = document.querySelector('.chat')
 
-const player1 = new Player({
-	player: 1,
-	name: 'Scorpion',
-	hp: 100,
-	img: 'http://reactmarathon-api.herokuapp.com/assets/scorpion.gif',
-	weapon: ['Sword', 'Bow'],
-	rootSelector: 'arenas'
-})
+let player1
+let player2
 
-const player2 = new Player({
-	player: 2,
-	name: 'Sub-Zero',
-	hp: 100,
-	img: 'http://reactmarathon-api.herokuapp.com/assets/subzero.gif',
-	weapon: ['Sword', 'Bow'],
-	rootSelector: 'arenas'
-})
+// const player1 = new Player({
+// 	player: 1,
+// 	name: 'Scorpion',
+// 	hp: 100,
+// 	img: 'http://reactmarathon-api.herokuapp.com/assets/scorpion.gif',
+// 	weapon: ['Sword', 'Bow'],
+// 	rootSelector: 'arenas'
+// })
+
+// const player2 = new Player({
+// 	player: 2,
+// 	name: 'Sub-Zero',
+// 	hp: 100,
+// 	img: 'http://reactmarathon-api.herokuapp.com/assets/subzero.gif',
+// 	weapon: ['Sword', 'Bow'],
+// 	rootSelector: 'arenas'
+// })
+
+console.log()
 
 export default class Game {
 	constructor(props) {}
+
+	getLocalPlayer = () => JSON.parse(localStorage.getItem('player1'))
+
+	gerPlayers = async () => {
+		const body = fetch('https://reactmarathon-api.herokuapp.com/api/mk/players').then(res => res.json())
+		return body
+	}
 
 	playerWins = name => {
 		const $winTitle = createElement('div', 'loseTitle')
@@ -135,9 +147,26 @@ export default class Game {
 		$chat.insertAdjacentHTML('afterbegin', el)
 	}
 
-	start = () => {
+	start = async () => {
+		const players = await this.gerPlayers()
+
+		const p1 = this.getLocalPlayer()
+
+		const p2 = players[getRandom(players.length) - 1]
+
+		player1 = new Player({
+			...p1,
+			player: 1,
+			rootSelector: 'arenas'
+		})
+		player2 = new Player({
+			...p2,
+			player: 2,
+			rootSelector: 'arenas'
+		})
 		player1.createPlayer()
 		player2.createPlayer()
+
 		this.generateLogs('start', player1, player2)
 		$formFight.addEventListener('submit', e => {
 			e.preventDefault()
