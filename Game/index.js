@@ -151,7 +151,6 @@ export default class Game {
 		const players = await this.gerPlayers()
 
 		const p1 = this.getLocalPlayer()
-		console.log(p1)
 
 		const p2 = players[getRandom(players.length) - 1]
 
@@ -160,7 +159,6 @@ export default class Game {
 			player: 1,
 			rootSelector: 'arenas'
 		})
-		console.log(player1)
 		player2 = new Player({
 			...p2,
 			player: 2,
